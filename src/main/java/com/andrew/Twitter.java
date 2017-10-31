@@ -10,21 +10,106 @@ public class Twitter {
 
     public static void main(String[] args) {
 
-        if (args.length != 2) {
-            throw new RuntimeException("exactly two commandline params expected, 1: users Filepath and 2: tweets Filepath");
-        }
+        validateCommandLineArguments(args);
 
-        //For the given input we get back {Ward=[Alan, Martin], Alan=[Martin]}
-        Map<String, Set<String>> follows = parseUsersFile(args[0]);
+        //Build up a data structure based on user.txt
+        //For each Person as key, I store a unique list of people that they follow as the value
+        //I just use a plain String to represent a Person/Twitter handle for now but this could become a class later
+        Map<String, Set < String >> whoFollowsWho = parseUsersFile(args[0]);
 
-        System.out.println(follows);
+        //Make each person follow themselves. The input file given does not explicitly specify this.
+                //(if it did then the program would not have a problem, since I am using a Set)
+        //I prefer to make explicit the fact that this method modifies its input.
+        //(IntelliJ's extract method did not do it this way)
+        whoFollowsWho = makeEachPersonFollowThemselves(whoFollowsWho);
 
+        //Build up a data structure based on tweet.txt
         List<Tweet> tweets = parseTweetsFile(args[1]);
 
-        System.out.println(tweets);
+        //Martin does not tweet and is only mentioned via being followed, but he still must appear in the output
+        //To build a list of all persons involved we need to go through all followed as well as all followers
+        Set<String> listOfAllPersons = buildListOfAllPersons(whoFollowsWho);
+
+        // printTwitterStreamForAllPersons(listOfAllPersons,whoFollowsWho, tweets);
+
+        Map<String, List<Tweet>> tweetsPerPerson = buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
+
+        printTweetsPerPerson(tweetsPerPerson);
 
     }
 
+    private static void printTweetsPerPerson(Map<String, List<Tweet>>
+                                                     tweetsPerPerson) {
+
+        for (String person : tweetsPerPerson.keySet()) {
+
+            //I don't feel like using StringBuilder
+            //I could stream to stdout to be fancy?
+            System.out.println(person + "\n");
+
+            for (Tweet tweet : tweetsPerPerson.get(person)) {
+                System.out.println("\t@" + tweet.getPerson() + ": " +
+                        tweet.getMessage() + "\n");
+            }
+
+        }
+
+    }
+
+    private static Map<String, List<Tweet>>
+    buildTweetsPerPerson(Set<String> listOfAllPersons, Map<String,
+            Set<String>> whoFollowsWho, List<Tweet> tweets) {
+
+        Map<String, List<Tweet>> tweetsPerPerson = new TreeMap<>();
+
+        for (String person : listOfAllPersons) {
+
+            tweetsPerPerson.put(person, new ArrayList<>());
+
+            for (Tweet tweet : tweets) {
+
+                Set<String> followed = whoFollowsWho.get(person);
+
+                if (followed != null && followed.contains(tweet.getPerson())) {
+                    tweetsPerPerson.get(person).add(tweet);
+                }
+
+            }
+        }
+
+        return tweetsPerPerson;
+
+    }
+
+    private static Map<String, Set<String>>
+    makeEachPersonFollowThemselves(Map<String, Set<String>> whoFollowsWho) {
+        for (String person : whoFollowsWho.keySet()) {
+            whoFollowsWho.get(person).add(person);
+        }
+        return whoFollowsWho;
+    }
+
+    private static void validateCommandLineArguments(String[] args) {
+        if (args.length != 2) {
+            throw new RuntimeException("exactly two commandline params expected, 1:users Filepath and 2:tweets Filepath ");
+        }
+    }
+
+    private static Set<String> buildListOfAllPersons(Map<String,
+            Set<String>> follows) {
+
+        //I use TreeSet to get alphabetical sorting, which will give me the desired console output(Alan then Martin then Ward)
+        Set<String> listOfAllPersons = new TreeSet<>();
+
+        for (String person : follows.keySet()) {
+
+            listOfAllPersons.add(person);
+            listOfAllPersons.addAll(follows.get(person));
+        }
+
+        return listOfAllPersons;
+
+    }
 
     private static List<Tweet> parseTweetsFile(String tweetsFilepath) {
 
@@ -36,14 +121,14 @@ public class Twitter {
                         String[] vals = line.split("> ");
                         if (vals.length != 2) {
                             //todo sprintf
-                            throw new RuntimeException("invalid tweet file line:"+line);
+                            throw new RuntimeException("invalid tweet file line:" + line);
                         }
                         Tweet tweet = new Tweet(vals[0], vals[1]);
                         tweets.add(tweet);
                     }
             );
         } catch (IOException e) {
-            throw new RuntimeException("Problem reading from tweetsFilepath: ", e);
+            throw new RuntimeException("Problem reading from tweetsFilepath:", e);
         }
         return tweets;
 
@@ -60,30 +145,33 @@ public class Twitter {
 
                         String[] vals = line.split(" follows ");
                         if (vals.length != 2) {
-                            //todo sprintf
-                            throw new RuntimeException("invalid user file line:"+line);
+                            //TODO sprintf
+                            throw new RuntimeException("invalid user file line:" + line);
                         }
 
                         String person = vals[0];
-//                        TODO - should I chomp and be tolerant?
-                        //There may be duplicates so go for a list not a Set
-                        List<String> peopleFollowedByPerson = Arrays.asList(vals[1].split(", "));
+                        //TODO - split on , and chomp any whitespace
+                        List<String> peopleFollowedByPerson =
+                                Arrays.asList(vals[1].split(", "));
 
                         if (follows.containsKey(person)) {
-                            Set<String> setOfPeopleFollowedByPerson = follows.get(person);
-                            setOfPeopleFollowedByPerson.addAll(peopleFollowedByPerson);
+                            Set<String> setOfPeopleFollowedByPerson =
+                                    follows.get(person);
 
+                            setOfPeopleFollowedByPerson.addAll(peopleFollowedByPerson);
                         } else {
-                            follows.put(person, new HashSet(peopleFollowedByPerson));
+                            follows.put(person, new
+                                    HashSet(peopleFollowedByPerson));
                         }
 
                     }
             );
         } catch (IOException e) {
-            throw new RuntimeException("Problem reading from usersFilepath: ", e);
+            throw new RuntimeException("Problem reading from usersFilepath:", e);
         }
         return follows;
 
     }
+
 
 }
