@@ -17,7 +17,7 @@ public class TwitterParser {
 
         //Martin does not tweet and is only mentioned via being followed, but he still must appear in the output
         //To build a list of all persons involved we need to go through all followed as well as all followers
-        //If I was using state in this class I could probably have accomplished this while inside parseUsersFile
+        //If I was using state in this class I could probably have accomplished this while inside parseUsers
         //but I would rather have one method return one thing with no side effects
         Set<String> listOfAllPersons = buildListOfAllPersons(whoFollowsWho);
 
@@ -34,13 +34,11 @@ public class TwitterParser {
 
     }
 
-    private static void printTweetsPerPerson(Map<String, List<Tweet>>
-                                                     tweetsPerPerson) {
+    private static void printTweetsPerPerson(Map<String, List<Tweet>> tweetsPerPerson) {
 
         for (String person : tweetsPerPerson.keySet()) {
 
             //I don't feel like using StringBuilder
-            //I could stream to stdout to be fancy?
             System.out.println(person + "\n");
 
             for (Tweet tweet : tweetsPerPerson.get(person)) {
@@ -52,9 +50,7 @@ public class TwitterParser {
 
     }
 
-    private static Map<String, List<Tweet>>
-    buildTweetsPerPerson(Set<String> listOfAllPersons, Map<String,
-            Set<String>> whoFollowsWho, List<Tweet> tweets) {
+    private static Map<String, List<Tweet>> buildTweetsPerPerson(Set<String> listOfAllPersons, Map<String, Set<String>> whoFollowsWho, List<Tweet> tweets) {
 
         Map<String, List<Tweet>> tweetsPerPerson = new TreeMap<>();
 
@@ -98,7 +94,6 @@ public class TwitterParser {
         return listOfAllPersons;
 
     }
-
 
     private static List<Tweet> parseTweets(Stream<String> stream) {
 
@@ -147,9 +142,7 @@ public class TwitterParser {
                             Arrays.asList(vals[1].split(", "));
 
                     if (follows.containsKey(person)) {
-                        Set<String> setOfPeopleFollowedByPerson =
-                                follows.get(person);
-
+                        Set<String> setOfPeopleFollowedByPerson = follows.get(person);
                         setOfPeopleFollowedByPerson.addAll(peopleFollowedByPerson);
                     } else {
                         follows.put(person, new HashSet(peopleFollowedByPerson));
@@ -161,6 +154,5 @@ public class TwitterParser {
         return follows;
 
     }
-
 
 }
