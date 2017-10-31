@@ -1,8 +1,5 @@
 package com.andrew;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -103,10 +100,13 @@ public class TwitterParser {
     }
 
 
-
     private static List<Tweet> parseTweets(Stream<String> stream) {
 
         List<Tweet> tweets = new ArrayList<>();
+
+        if (stream == null) {
+            return tweets;
+        }
 
         stream.forEach(
                 line -> {
@@ -127,6 +127,10 @@ public class TwitterParser {
     private static Map<String, Set<String>> parseUsers(Stream<String> stream) {
 
         Map<String, Set<String>> follows = new HashMap<>();
+
+        if (stream == null) {
+            return follows;
+        }
 
         stream.forEach(
                 line -> {
