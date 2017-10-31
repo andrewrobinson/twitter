@@ -111,62 +111,80 @@ public class TwitterParser {
 
     }
 
+
     private static List<Tweet> parseTweetsFile(String tweetsFilepath) {
 
-        List<Tweet> tweets = new ArrayList<>();
-
-        try (Stream<String> stream = Files.lines(Paths.get(tweetsFilepath))) {
-            stream.forEach(
-                    line -> {
-                        String[] vals = line.split("> ");
-                        if (vals.length != 2) {
-                            //todo sprintf
-                            throw new RuntimeException("invalid tweet file line:" + line);
-                        }
-                        Tweet tweet = new Tweet(vals[0], vals[1]);
-                        tweets.add(tweet);
-                    }
-            );
+        try {
+            Stream<String> stream = Files.lines(Paths.get(tweetsFilepath));
+            return parseTweets(stream);
         } catch (IOException e) {
             throw new RuntimeException("Problem reading from tweetsFilepath:", e);
         }
+
+
+    }
+
+    private static List<Tweet> parseTweets(Stream<String> stream) {
+
+        List<Tweet> tweets = new ArrayList<>();
+
+        stream.forEach(
+                line -> {
+                    String[] vals = line.split("> ");
+                    if (vals.length != 2) {
+                        //todo sprintf
+                        throw new RuntimeException("invalid tweet file line:" + line);
+                    }
+                    Tweet tweet = new Tweet(vals[0], vals[1]);
+                    tweets.add(tweet);
+                }
+        );
+
         return tweets;
 
     }
 
     private static Map<String, Set<String>> parseUsersFile(String usersFilepath) {
 
-        Map<String, Set<String>> follows = new HashMap<>();
-
-        try (Stream<String> stream = Files.lines(Paths.get(usersFilepath))) {
-            stream.forEach(
-                    line -> {
-
-                        String[] vals = line.split(" follows ");
-                        if (vals.length != 2) {
-                            //TODO sprintf
-                            throw new RuntimeException("invalid user file line:" + line);
-                        }
-
-                        String person = vals[0];
-                        //TODO - split on , and chomp any whitespace
-                        List<String> peopleFollowedByPerson =
-                                Arrays.asList(vals[1].split(", "));
-
-                        if (follows.containsKey(person)) {
-                            Set<String> setOfPeopleFollowedByPerson =
-                                    follows.get(person);
-
-                            setOfPeopleFollowedByPerson.addAll(peopleFollowedByPerson);
-                        } else {
-                            follows.put(person, new HashSet(peopleFollowedByPerson));
-                        }
-
-                    }
-            );
+        try {
+            Stream<String> stream = Files.lines(Paths.get(usersFilepath));
+            return parseUsers(stream);
         } catch (IOException e) {
             throw new RuntimeException("Problem reading from usersFilepath:", e);
         }
+
+    }
+
+    private static Map<String, Set<String>> parseUsers(Stream<String> stream) {
+
+        Map<String, Set<String>> follows = new HashMap<>();
+
+        stream.forEach(
+                line -> {
+
+                    String[] vals = line.split(" follows ");
+                    if (vals.length != 2) {
+                        //TODO sprintf
+                        throw new RuntimeException("invalid user file line:" + line);
+                    }
+
+                    String person = vals[0];
+                    //TODO - split on , and chomp any whitespace
+                    List<String> peopleFollowedByPerson =
+                            Arrays.asList(vals[1].split(", "));
+
+                    if (follows.containsKey(person)) {
+                        Set<String> setOfPeopleFollowedByPerson =
+                                follows.get(person);
+
+                        setOfPeopleFollowedByPerson.addAll(peopleFollowedByPerson);
+                    } else {
+                        follows.put(person, new HashSet(peopleFollowedByPerson));
+                    }
+
+                }
+        );
+
         return follows;
 
     }
