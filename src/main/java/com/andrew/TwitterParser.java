@@ -8,24 +8,15 @@ import java.util.stream.Stream;
 
 public class TwitterParser {
 
-    String userFilepath;
-
-    String tweetsFilepath;
-
-    public TwitterParser(String userFilepath, String tweetsFilepath) {
-        this.userFilepath = userFilepath;
-        this.tweetsFilepath = tweetsFilepath;
-    }
-
-    public void showTweets() {
+    public static void showTweets(Stream<String> users, Stream<String> allTweets) {
 
         //Build up a data structure based on user.txt
         //For each Person as key, I store a unique list of people that they follow as the value
         //I just use a plain String to represent a Person/TwitterParser handle for now but this could become a class later
-        Map<String, Set<String>> whoFollowsWho = parseUsersFile(userFilepath);
+        Map<String, Set<String>> whoFollowsWho = parseUsers(users);
 
         //Build up a data structure based on tweet.txt
-        List<Tweet> tweets = parseTweetsFile(tweetsFilepath);
+        List<Tweet> tweets = parseTweets(allTweets);
 
         //Martin does not tweet and is only mentioned via being followed, but he still must appear in the output
         //To build a list of all persons involved we need to go through all followed as well as all followers
@@ -112,17 +103,6 @@ public class TwitterParser {
     }
 
 
-    private static List<Tweet> parseTweetsFile(String tweetsFilepath) {
-
-        try {
-            Stream<String> stream = Files.lines(Paths.get(tweetsFilepath));
-            return parseTweets(stream);
-        } catch (IOException e) {
-            throw new RuntimeException("Problem reading from tweetsFilepath:", e);
-        }
-
-
-    }
 
     private static List<Tweet> parseTweets(Stream<String> stream) {
 
@@ -141,17 +121,6 @@ public class TwitterParser {
         );
 
         return tweets;
-
-    }
-
-    private static Map<String, Set<String>> parseUsersFile(String usersFilepath) {
-
-        try {
-            Stream<String> stream = Files.lines(Paths.get(usersFilepath));
-            return parseUsers(stream);
-        } catch (IOException e) {
-            throw new RuntimeException("Problem reading from usersFilepath:", e);
-        }
 
     }
 

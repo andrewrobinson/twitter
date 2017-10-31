@@ -1,5 +1,10 @@
 package com.andrew;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -8,9 +13,20 @@ public class Main {
             throw new RuntimeException("exactly two commandline params expected, 1:users Filepath and 2:tweets Filepath ");
         }
 
-        TwitterParser twitter = new TwitterParser(args[0], args[1]);
-        twitter.showTweets();
+        Stream<String> users = readFileAsStream(args[0], "Problem reading from usersFilepath:");
+        Stream<String> allTweets = readFileAsStream(args[1], "Problem reading from tweetsFilepath:");
 
+        TwitterParser.showTweets(users, allTweets);
+
+    }
+
+    private static Stream<String> readFileAsStream(String filename, String errorMessage) {
+
+        try {
+            return Files.lines(Paths.get(filename));
+        } catch (IOException e) {
+            throw new RuntimeException(errorMessage, e);
+        }
 
     }
 
