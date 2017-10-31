@@ -6,19 +6,26 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Twitter {
+public class TwitterParser {
 
-    public static void main(String[] args) {
+    String userFilepath;
 
-        validateCommandLineArguments(args);
+    String tweetsFilepath;
+
+    public TwitterParser(String userFilepath, String tweetsFilepath) {
+        this.userFilepath = userFilepath;
+        this.tweetsFilepath = tweetsFilepath;
+    }
+
+    public void showTweets() {
 
         //Build up a data structure based on user.txt
         //For each Person as key, I store a unique list of people that they follow as the value
-        //I just use a plain String to represent a Person/Twitter handle for now but this could become a class later
-        Map<String, Set<String>> whoFollowsWho = parseUsersFile(args[0]);
+        //I just use a plain String to represent a Person/TwitterParser handle for now but this could become a class later
+        Map<String, Set<String>> whoFollowsWho = parseUsersFile(userFilepath);
 
         //Build up a data structure based on tweet.txt
-        List<Tweet> tweets = parseTweetsFile(args[1]);
+        List<Tweet> tweets = parseTweetsFile(tweetsFilepath);
 
         //Martin does not tweet and is only mentioned via being followed, but he still must appear in the output
         //To build a list of all persons involved we need to go through all followed as well as all followers
@@ -82,22 +89,14 @@ public class Twitter {
 
     }
 
-    private static Map<String, Set<String>>
-    makeEachPersonFollowThemselves(Map<String, Set<String>> whoFollowsWho) {
+    private static Map<String, Set<String>> makeEachPersonFollowThemselves(Map<String, Set<String>> whoFollowsWho) {
         for (String person : whoFollowsWho.keySet()) {
             whoFollowsWho.get(person).add(person);
         }
         return whoFollowsWho;
     }
 
-    private static void validateCommandLineArguments(String[] args) {
-        if (args.length != 2) {
-            throw new RuntimeException("exactly two commandline params expected, 1:users Filepath and 2:tweets Filepath ");
-        }
-    }
-
-    private static Set<String> buildListOfAllPersons(Map<String,
-            Set<String>> follows) {
+    private static Set<String> buildListOfAllPersons(Map<String, Set<String>> follows) {
 
         //I use TreeSet to get alphabetical sorting, which will give me the desired console output(Alan then Martin then Ward)
         Set<String> listOfAllPersons = new TreeSet<>();
@@ -135,8 +134,7 @@ public class Twitter {
 
     }
 
-    private static Map<String, Set<String>> parseUsersFile(String
-                                                                   usersFilepath) {
+    private static Map<String, Set<String>> parseUsersFile(String usersFilepath) {
 
         Map<String, Set<String>> follows = new HashMap<>();
 

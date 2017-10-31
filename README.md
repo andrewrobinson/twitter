@@ -1,15 +1,21 @@
 
 
-Inclusivity coding assignment - Andrew Robinson
+Allan Gray coding assignment - Andrew Robinson - 30/10/2017
 ===============================================
 
-For example, given a string input of:
-'AS, 10C, 10H, 3D, 3S'
-(the cards above are ace of spades, 10 of clubs, 10 of hearts, 3 of diamonds and 3 of spades)
-Output would be: 'Two Pair'
 
+To run:
+-------
 
-Taken from https://en.wikipedia.org/wiki/List_of_poker_hand_categories
-----------------------------------------------------------------------
+a)
+
+mvn clean package
+
+java -jar target/twitter-1.0-SNAPSHOT.jar user.txt tweet.txt
+
+b) 
+
+Or in an IDE, run the main method in the Tweet class
+
 
  
