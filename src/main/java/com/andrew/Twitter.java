@@ -15,24 +15,25 @@ public class Twitter {
         //Build up a data structure based on user.txt
         //For each Person as key, I store a unique list of people that they follow as the value
         //I just use a plain String to represent a Person/Twitter handle for now but this could become a class later
-        Map<String, Set < String >> whoFollowsWho = parseUsersFile(args[0]);
-
-        //Make each person follow themselves. The input file given does not explicitly specify this.
-                //(if it did then the program would not have a problem, since I am using a Set)
-        //I prefer to make explicit the fact that this method modifies its input.
-        //(IntelliJ's extract method did not do it this way)
-        whoFollowsWho = makeEachPersonFollowThemselves(whoFollowsWho);
+        Map<String, Set<String>> whoFollowsWho = parseUsersFile(args[0]);
 
         //Build up a data structure based on tweet.txt
         List<Tweet> tweets = parseTweetsFile(args[1]);
 
         //Martin does not tweet and is only mentioned via being followed, but he still must appear in the output
         //To build a list of all persons involved we need to go through all followed as well as all followers
+        //If I was using state in this class I could probably have accomplished this while inside parseUsersFile
+        //but I would rather have one method return one thing with no side effects
         Set<String> listOfAllPersons = buildListOfAllPersons(whoFollowsWho);
 
-        // printTwitterStreamForAllPersons(listOfAllPersons,whoFollowsWho, tweets);
+        //Make each person follow themselves. The input file given does not explicitly specify this.
+        //(if it did then the program would not have a problem, since I am using a Set)
+        //I prefer to make explicit the fact that this method modifies its input.
+        //(IntelliJ's extract method did not do it this way)
+        whoFollowsWho = makeEachPersonFollowThemselves(whoFollowsWho);
 
-        Map<String, List<Tweet>> tweetsPerPerson = buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
+        Map<String, List<Tweet>> tweetsPerPerson =
+                buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
 
         printTweetsPerPerson(tweetsPerPerson);
 
@@ -160,8 +161,7 @@ public class Twitter {
 
                             setOfPeopleFollowedByPerson.addAll(peopleFollowedByPerson);
                         } else {
-                            follows.put(person, new
-                                    HashSet(peopleFollowedByPerson));
+                            follows.put(person, new HashSet(peopleFollowedByPerson));
                         }
 
                     }

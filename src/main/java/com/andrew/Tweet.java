@@ -10,7 +10,6 @@ public class Tweet {
         this.message = message;
     }
 
-
     public String getPerson() {
         return person;
     }
