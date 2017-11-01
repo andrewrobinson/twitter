@@ -2,16 +2,16 @@ package com.andrew;
 
 public class Tweet {
 
-    String person;
+    String user;
     String message;
 
     public Tweet(String person, String message) {
-        this.person = person;
+        this.user = person;
         this.message = message;
     }
 
-    public String getPerson() {
-        return person;
+    public String getUser() {
+        return user;
     }
 
     public String getMessage() {
