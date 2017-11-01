@@ -1,21 +1,32 @@
 
 
-Allan Gray coding assignment - Andrew Robinson - 30/10/2017
+Allan Gray coding assignment - Andrew Robinson - 01/11/2017
 ===============================================
 
+TODO
+----------
+
+ users and followers not Person and followers
+
+ unit tests. no space after comma etc
+ 
+ stream out / stringbuilder? / test it with large files
 
 To run:
 -------
-
-a)
 
 mvn clean package
 
 java -jar target/twitter-1.0-SNAPSHOT.jar user.txt tweet.txt
 
-b) 
+Or, in an IDE, run the main method in the Main class (supplying command line options)
 
-Or in an IDE, run the main method in the Main class (supplying command line options)
+
+What I haven't catered for:
+---------------------------
+
+I assumed the user and tweet files would be formatted exactly like those supplied and didn't try and
+make the parser resilient to things like no spaces after the comma or the >
 
 
 A note about how I wrote this:
@@ -36,4 +47,3 @@ Without testing, for that problem, I would probably have struggled.
 https://github.com/andrewrobinson/poker
 
  
-TODO - tolerance of input files
