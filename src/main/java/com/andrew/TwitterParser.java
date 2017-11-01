@@ -58,8 +58,6 @@ public class TwitterParser {
 
         //Make each user follow themselves. The input file given does not explicitly specify this.
         //(if it did then the program would not have a problem, since I am using a Set)
-        //I prefer to make explicit the fact that this method modifies its input.
-        //(IntelliJ's extract method did not do it this way)
         whoFollowsWho = makeEachPersonFollowThemselves(whoFollowsWho);
 
         return buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
@@ -92,7 +90,7 @@ public class TwitterParser {
 
     private static Map<String, Set<String>> makeEachPersonFollowThemselves(Map<String, Set<String>> whoFollowsWho) {
 
-        //Sonarlint made me use this syntax instead of iterating over keySet()
+        //Sonarlint made me use this syntax, instead of iterating over keySet()
         for (Map.Entry<String, Set<String>> entry : whoFollowsWho.entrySet()) {
             entry.getValue().add(entry.getKey());
         }
