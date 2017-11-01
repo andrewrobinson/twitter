@@ -5,11 +5,46 @@ import java.util.stream.Stream;
 
 public class TwitterParser {
 
-    public static void showTweets(Stream<String> users, Stream<String> allTweets) {
+    /**
+     *
+     * This builds up the tweet feed as specified by the instructions
+     *
+     * @param users the Stream<String> from the user.txt file
+     * @param allTweets the Stream<String> from the tweet.txt
+     * @return the output as a String
+     */
+    public static String getTweetFeedForDisplay(Stream<String> users, Stream<String> allTweets) {
+
+        Map<String, List<Tweet>> tweetsPerUser = getTweetsPerUser(users, allTweets);
+
+        StringJoiner lineJoiner = new StringJoiner("\n");
+
+        for (Map.Entry<String, List<Tweet>> entry : tweetsPerUser.entrySet()) {
+
+            lineJoiner.add(entry.getKey());
+
+            for (Tweet tweet : entry.getValue()) {
+                lineJoiner.add(new StringBuilder("\t@").append(tweet.getUser()).append(": ").append(tweet.getMessage()));
+            }
+
+        }
+
+        return lineJoiner.toString();
+
+    }
+
+    /**
+     * This returns the desired output, but still in data structure form
+     *
+     * @param users
+     * @param allTweets
+     * @return  the desired output still in data structure form
+     */
+    protected static Map<String, List<Tweet>> getTweetsPerUser(Stream<String> users, Stream<String> allTweets) {
 
         //Build up a data structure based on user.txt
-        //For each Person as key, I store a unique list of people that they follow as the value
-        //I just use a plain String to represent a Person/TwitterParser handle for now but this could become a class later
+        //For each User as key, I store a unique list of users that they follow as the value
+        //I just use a plain String to represent a User/Twitter handle for now but this could become a class later
         Map<String, Set<String>> whoFollowsWho = parseUsers(users);
 
         //Build up a data structure based on tweet.txt
@@ -21,30 +56,13 @@ public class TwitterParser {
         //of this extra iteration but I would rather have one method return one thing with no side effects
         Set<String> listOfAllPersons = buildListOfAllPersons(whoFollowsWho);
 
-        //Make each person follow themselves. The input file given does not explicitly specify this.
+        //Make each user follow themselves. The input file given does not explicitly specify this.
         //(if it did then the program would not have a problem, since I am using a Set)
         //I prefer to make explicit the fact that this method modifies its input.
         //(IntelliJ's extract method did not do it this way)
         whoFollowsWho = makeEachPersonFollowThemselves(whoFollowsWho);
 
-        Map<String, List<Tweet>> tweetsPerPerson = buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
-
-        printTweetsPerPerson(tweetsPerPerson);
-
-    }
-
-    private static void printTweetsPerPerson(Map<String, List<Tweet>> tweetsPerPerson) {
-
-        for (String person : tweetsPerPerson.keySet()) {
-
-            System.out.println(person + "\n");
-
-            for (Tweet tweet : tweetsPerPerson.get(person)) {
-                System.out.println("\t@" + tweet.getPerson() + ": " +
-                        tweet.getMessage() + "\n");
-            }
-
-        }
+        return buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
 
     }
 
@@ -61,7 +79,7 @@ public class TwitterParser {
 
                 Set<String> followed = whoFollowsWho.get(person);
 
-                if (followed != null && followed.contains(tweet.getPerson())) {
+                if (followed != null && followed.contains(tweet.getUser())) {
                     tweetsPerPerson.get(person).add(tweet);
                 }
 
@@ -73,8 +91,10 @@ public class TwitterParser {
     }
 
     private static Map<String, Set<String>> makeEachPersonFollowThemselves(Map<String, Set<String>> whoFollowsWho) {
-        for (String person : whoFollowsWho.keySet()) {
-            whoFollowsWho.get(person).add(person);
+
+        //Sonarlint made me use this syntax instead of iterating over keySet()
+        for (Map.Entry<String, Set<String>> entry : whoFollowsWho.entrySet()) {
+            entry.getValue().add(entry.getKey());
         }
         return whoFollowsWho;
     }
@@ -83,10 +103,9 @@ public class TwitterParser {
 
        Set<String> listOfAllPersons = new HashSet<>();
 
-        for (String person : follows.keySet()) {
-
-            listOfAllPersons.add(person);
-            listOfAllPersons.addAll(follows.get(person));
+        for (Map.Entry<String, Set<String>> entry : follows.entrySet()) {
+            listOfAllPersons.add(entry.getKey());
+            listOfAllPersons.addAll(entry.getValue());
         }
 
         return listOfAllPersons;
@@ -116,7 +135,7 @@ public class TwitterParser {
 
     }
 
-    private static Map<String, Set<String>> parseUsers(Stream<String> stream) {
+    protected static Map<String, Set<String>> parseUsers(Stream<String> stream) {
 
         Map<String, Set<String>> follows = new HashMap<>();
 
@@ -133,8 +152,15 @@ public class TwitterParser {
                     }
 
                     String person = vals[0];
-                    List<String> peopleFollowedByPerson =
-                            Arrays.asList(vals[1].split(", "));
+
+                    //"Each line of a well-formed user file contains a user, followed by the word 'follows' and then a comma separated list of users they follow."
+                    //Although the supplied user file has a comma and then a space between users, the space is not specified
+
+                    //If it weren't for this, I would split on ", " and not need the String::trim below
+                    List<String> peopleFollowedByPerson = Arrays.asList(vals[1].split(","));
+
+                    //If there was a space after the comma, we need to remove it as it will be part of the "user name"
+                    peopleFollowedByPerson.replaceAll(String::trim);
 
                     if (follows.containsKey(person)) {
                         Set<String> setOfPeopleFollowedByPerson = follows.get(person);
