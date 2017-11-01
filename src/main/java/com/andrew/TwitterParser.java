@@ -17,8 +17,8 @@ public class TwitterParser {
 
         //Martin does not tweet and is only mentioned via being followed, but he still must appear in the output
         //To build a list of all persons involved we need to go through all followed as well as all followers
-        //If I was using state in this class I could probably have accomplished this while inside parseUsers
-        //but I would rather have one method return one thing with no side effects
+        //If I was using state in this class I could probably have accomplished this while inside parseUsers instead
+        //of this extra iteration but I would rather have one method return one thing with no side effects
         Set<String> listOfAllPersons = buildListOfAllPersons(whoFollowsWho);
 
         //Make each person follow themselves. The input file given does not explicitly specify this.
@@ -27,8 +27,7 @@ public class TwitterParser {
         //(IntelliJ's extract method did not do it this way)
         whoFollowsWho = makeEachPersonFollowThemselves(whoFollowsWho);
 
-        Map<String, List<Tweet>> tweetsPerPerson =
-                buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
+        Map<String, List<Tweet>> tweetsPerPerson = buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
 
         printTweetsPerPerson(tweetsPerPerson);
 
@@ -38,7 +37,6 @@ public class TwitterParser {
 
         for (String person : tweetsPerPerson.keySet()) {
 
-            //I don't feel like using StringBuilder
             System.out.println(person + "\n");
 
             for (Tweet tweet : tweetsPerPerson.get(person)) {
@@ -52,6 +50,7 @@ public class TwitterParser {
 
     private static Map<String, List<Tweet>> buildTweetsPerPerson(Set<String> listOfAllPersons, Map<String, Set<String>> whoFollowsWho, List<Tweet> tweets) {
 
+        //I use TreeMap to get alphabetical key sorting, which will give me the desired console output(Alan then Martin then Ward)
         Map<String, List<Tweet>> tweetsPerPerson = new TreeMap<>();
 
         for (String person : listOfAllPersons) {
@@ -82,8 +81,7 @@ public class TwitterParser {
 
     private static Set<String> buildListOfAllPersons(Map<String, Set<String>> follows) {
 
-        //I use TreeSet to get alphabetical sorting, which will give me the desired console output(Alan then Martin then Ward)
-        Set<String> listOfAllPersons = new TreeSet<>();
+       Set<String> listOfAllPersons = new HashSet<>();
 
         for (String person : follows.keySet()) {
 
@@ -107,7 +105,6 @@ public class TwitterParser {
                 line -> {
                     String[] vals = line.split("> ");
                     if (vals.length != 2) {
-                        //todo sprintf
                         throw new RuntimeException("invalid tweet file line:" + line);
                     }
                     Tweet tweet = new Tweet(vals[0], vals[1]);
@@ -132,12 +129,10 @@ public class TwitterParser {
 
                     String[] vals = line.split(" follows ");
                     if (vals.length != 2) {
-                        //TODO sprintf
                         throw new RuntimeException("invalid user file line:" + line);
                     }
 
                     String person = vals[0];
-                    //TODO - split on , and chomp any whitespace
                     List<String> peopleFollowedByPerson =
                             Arrays.asList(vals[1].split(", "));
 
