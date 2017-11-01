@@ -1,6 +1,7 @@
 package com.andrew;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
@@ -23,7 +24,7 @@ public class Main {
     private static Stream<String> readFileAsStream(String filename, String errorMessage) {
 
         try {
-            return Files.lines(Paths.get(filename));
+            return Files.lines(Paths.get(filename), StandardCharsets.US_ASCII);
         } catch (IOException e) {
             throw new RuntimeException(errorMessage, e);
         }
