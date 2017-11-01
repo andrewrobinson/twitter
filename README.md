@@ -3,15 +3,6 @@
 Allan Gray coding assignment - Andrew Robinson - 01/11/2017
 ===============================================
 
-TODO
-----------
-
- users and followers not Person and followers
-
- unit tests. no space after comma etc
- 
- stream out / stringbuilder? / test it with large files
-
 To run:
 -------
 
@@ -22,28 +13,43 @@ java -jar target/twitter-1.0-SNAPSHOT.jar user.txt tweet.txt
 Or, in an IDE, run the main method in the Main class (supplying command line options)
 
 
-What I haven't catered for:
----------------------------
+Notes
+-----
 
-I assumed the user and tweet files would be formatted exactly like those supplied and didn't try and
-make the parser resilient to things like no spaces after the comma or the >
+I've tried to find a balance between "sufficient quality to run on a production system" and prematurely optimising.
+
+Obvious thoughts going further are
+
+"What if the files were larger?"
+
+"Could this program run over long periods of time, consuming from these files as they grew?"
+
+"How could you decompose this algorithm further and even distribute it if necessary?"
+
+I might experiment further but feel I need to wrap this assignment up now.
+
+My getTweetFeedForDisplay method would need to return a Stream and all code within it would probably need to be chained.
+
+The instructions say:
+"Where there is more than one entry for a user, consider the union of all these entries to determine the users they follow."
+
+This gives you no mechanism for ever allowing someone to "unfollow" someone, assuming this was an ever-growing file.
 
 
-A note about how I wrote this:
-------------------------------
+How I wrote this
+----------------
 
-I wrote my initial solution inside an existing project on my work machine after work.
-I then mailed this code across to my home laptop and added version control and a pom.
-Then I thought about test coverage so refactored a bit to remove file access from things.
-Hopefully I haven't prematurely optimised! 
-I was starting to think about how decomposed / distributed this processing might be in the real Twitter.
+I wrote this code initially in a main method, just inspecting stdout, but then extracted methods / redesigned it so as to be
+more testable. I also wrote bits at work, after hours, and then transferred files over to my home laptop and back so don't expect
+a proper git history. (I couldn't easily access github from my work machine)
 
-I do often write test-first code though.
+The testing phase allowed me to catch the fact that I was producing extra line breaks after the last tweet displayed.
+For the feature that I added where the comma separated list of users could handle optional spaces,
+I wrote a test to fail first and then implemented the feature.
 
-Here is a coding assignment I wrote recently where doing it test-first 
-allowed me to solve it better, faster and more reliably.
-Without testing, for that problem, I would probably have struggled.
+I did a coding assignment for another company recently and in that one I did strict test-first development.
+For this one it didn't feel as essential.
 
-https://github.com/andrewrobinson/poker
+
 
  
