@@ -1,6 +1,6 @@
 
 
-Allan Gray coding assignment - Andrew Robinson - 01/11/2017
+Coding assignment - Andrew Robinson - 01/11/2017
 ===============================================
 
 To run:
