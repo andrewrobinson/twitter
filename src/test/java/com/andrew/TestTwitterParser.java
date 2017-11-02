@@ -30,7 +30,7 @@ public class TestTwitterParser {
 //        Then for each tweet, emit a line with the following format: <tab>@user: <space>message.
 
         //another option would have been to compare to a file read from src/test/resources
-        //if expected output had been supplied as part of the test, then I would have done it this way
+        //if expected output had been supplied as part of the test, then I would have done it that way
         String expected = "Alan\n" +
                 "\t@Alan: If you have a procedure with 10 parameters, you probably missed some.\n" +
                 "\t@Alan: Random numbers should not be generated with a method chosen at random.\n" +
