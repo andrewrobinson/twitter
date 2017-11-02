@@ -45,27 +45,28 @@ public class TestTwitterParser {
     }
 
     @Test
-    public void testGetTweetsPerPersonForGivenInput() {
+    public void testGetTweetsPerUserForGivenInput() {
 
         Stream<String> users = buildGivenUserStream();
         Stream<String> allTweets = buildGivenTweetStream();
-        Map<String, List<Tweet>> tweetsPerPerson = TwitterParser.getTweetsPerUser(users, allTweets);
+        Map<String, List<Tweet>> tweetsPerUser = TwitterParser.getTweetsPerUser(users, allTweets);
 
         //1. Prove that Users are ordered alphabetically
-        List<String> orderedListOfUsers = new ArrayList(tweetsPerPerson.keySet());
+        List<String> orderedListOfUsers = new ArrayList(tweetsPerUser.keySet());
 
         assertEquals("Alan", orderedListOfUsers.get(0));
         assertEquals("Martin", orderedListOfUsers.get(1));
         assertEquals("Ward", orderedListOfUsers.get(2));
 
-        assertEquals(2, tweetsPerPerson.get("Alan").size());
-        assertEquals(0, tweetsPerPerson.get("Martin").size());
-        assertEquals(3, tweetsPerPerson.get("Ward").size());
+        //2. assert about sizes. I could assert about actual Tweets but I also have a test for getTweetFeedForDisplay
+        assertEquals(2, tweetsPerUser.get("Alan").size());
+        assertEquals(0, tweetsPerUser.get("Martin").size());
+        assertEquals(3, tweetsPerUser.get("Ward").size());
 
     }
 
     @Test
-    public void testShowTweetsForNullInputs() {
+    public void testGetTweetsPerUserForNullInputs() {
 
         Stream<String> users = null;
         Stream<String> allTweets = null;
@@ -74,7 +75,7 @@ public class TestTwitterParser {
     }
 
     @Test(expected=RuntimeException.class)
-    public void testShowTweetsForInvalidUserInputs() {
+    public void testGetTweetsPerUserForInvalidUserInputs() {
 
         Stream<String> users = buildBadlyFormedUserStream();
         Stream<String> allTweets = buildGivenTweetStream();
@@ -83,7 +84,7 @@ public class TestTwitterParser {
     }
 
     @Test(expected=RuntimeException.class)
-    public void testShowTweetsForInvalidTweetInputs() {
+    public void testGetTweetsPerUserForInvalidTweetInputs() {
 
         Stream<String> users = buildGivenUserStream();
         Stream<String> allTweets = buildBadlyFormedTweetStream();
