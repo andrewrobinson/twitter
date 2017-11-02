@@ -54,17 +54,17 @@ public class TwitterParser {
         //To build a list of all persons involved we need to go through all followed as well as all followers
         //If I was using state in this class I could probably have accomplished this while inside parseUsers instead
         //of this extra iteration but I would rather have one method return one thing with no side effects
-        Set<String> listOfAllPersons = buildListOfAllPersons(whoFollowsWho);
+        Set<String> listOfAllUsers = buildListOfAllUsers(whoFollowsWho);
 
         //Make each user follow themselves. The input file given does not explicitly specify this.
         //(if it did then the program would not have a problem, since I am using a Set)
-        whoFollowsWho = makeEachPersonFollowThemselves(whoFollowsWho);
+        whoFollowsWho = makeEachUserFollowThemselves(whoFollowsWho);
 
-        return buildTweetsPerPerson(listOfAllPersons, whoFollowsWho, tweets);
+        return buildTweetsPerUser(listOfAllUsers, whoFollowsWho, tweets);
 
     }
 
-    private static Map<String, List<Tweet>> buildTweetsPerPerson(Set<String> listOfAllPersons, Map<String, Set<String>> whoFollowsWho, List<Tweet> tweets) {
+    private static Map<String, List<Tweet>> buildTweetsPerUser(Set<String> listOfAllPersons, Map<String, Set<String>> whoFollowsWho, List<Tweet> tweets) {
 
         //I use TreeMap to get alphabetical key sorting, which will give me the desired console output(Alan then Martin then Ward)
         Map<String, List<Tweet>> tweetsPerPerson = new TreeMap<>();
@@ -88,7 +88,7 @@ public class TwitterParser {
 
     }
 
-    private static Map<String, Set<String>> makeEachPersonFollowThemselves(Map<String, Set<String>> whoFollowsWho) {
+    private static Map<String, Set<String>> makeEachUserFollowThemselves(Map<String, Set<String>> whoFollowsWho) {
 
         //Sonarlint made me use this syntax, instead of iterating over keySet()
         for (Map.Entry<String, Set<String>> entry : whoFollowsWho.entrySet()) {
@@ -97,7 +97,7 @@ public class TwitterParser {
         return whoFollowsWho;
     }
 
-    private static Set<String> buildListOfAllPersons(Map<String, Set<String>> follows) {
+    private static Set<String> buildListOfAllUsers(Map<String, Set<String>> follows) {
 
        Set<String> listOfAllPersons = new HashSet<>();
 
